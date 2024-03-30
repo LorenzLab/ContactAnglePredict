@@ -4,8 +4,8 @@ import numpy as np
 import math
 from scipy import spatial
 
-img_path = "test_pics/6.jpg"
-
+IMG_PATH = "test_pics/7.jpg"
+SHOW_EDGES = False
 
 def find_intersect(circle, line, return_mode="xy"):
     """
@@ -91,9 +91,12 @@ def find_upper_or_lower_curve(image, circle, line, fitting_points=20):
 kernel_size = 5
 low_threshold = 95
 high_threshold = 100
-blur_times = 2
+blur_times = 1
 
-image = cv2.imread(img_path, cv2.IMREAD_COLOR)
+image = cv2.imread(IMG_PATH, cv2.IMREAD_COLOR)
+# crop the image to a square, middle part
+crop_size = min(image.shape[:2]) // 2
+image = image[image.shape[0] // 2 - crop_size : image.shape[0] // 2 + crop_size, image.shape[1] // 2 - crop_size : image.shape[1] // 2 + crop_size]
 image = cv2.resize(image, (880, 880))
 image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 linear_filter = image_gray
@@ -104,8 +107,9 @@ for i in range(blur_times):
 ret3, thresh = cv2.threshold(image_gray, 100, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 edges = cv2.Canny(thresh, low_threshold, high_threshold)
 
-cv2.imshow("edges", edges)
-cv2.waitKey(0)
+if SHOW_EDGES:
+    cv2.imshow("edges", edges)
+    cv2.waitKey(0)
 
 # Detecting lines
 lines = cv2.HoughLines(edges, 1, np.pi / 180, 200)
